@@ -39,12 +39,13 @@ type MetaStore struct {
 +}
 ...
 
-func NewMetaStore(blockStoreAddr string) *MetaStore {
+-func NewMetaStore(blockStoreAddr string) *MetaStore {
++func NewMetaStore(blockStoreAddrs []string) *MetaStore {
 	return &MetaStore{
 		FileMetaMap:    map[string]*FileMetaData{},
 -		BlockStoreAddr: blockStoreAddr,
 +		BlockStoreAddrs:    blockStoreAddrs,
-+		ConsistentHashRing: consistentHashRing,
++		ConsistentHashRing: NewConsistentHashRing(blockStoreAddrs),
 	}
 }
 ```
