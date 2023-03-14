@@ -18,7 +18,7 @@ func (c ConsistentHashRing) GetResponsibleServer(blockId string) string {
 	}
 	sort.Strings(hashKeys)
 	for _, dat := range hashKeys {
-		if blockId < dat {
+		if blockId <= dat {
 			return c.ServerMap[dat]
 		}
 	}
