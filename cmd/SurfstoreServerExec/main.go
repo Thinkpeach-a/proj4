@@ -1,10 +1,13 @@
 package main
 
 import (
+	"cse224/proj4/pkg/surfstore"
 	"flag"
 	"fmt"
+	"google.golang.org/grpc"
 	"io/ioutil"
 	"log"
+	"net"
 	"os"
 	"strconv"
 	"strings"
@@ -62,10 +65,33 @@ func main() {
 		log.SetFlags(0)
 		log.SetOutput(ioutil.Discard)
 	}
-
+	//log.Println("addr: ", addr, "blockStoreAddrs: ", blockStoreAddrs)
 	log.Fatal(startServer(addr, strings.ToLower(*service), blockStoreAddrs))
 }
 
 func startServer(hostAddr string, serviceType string, blockStoreAddrs []string) error {
-	panic("todo")
+	grpcServer := grpc.NewServer()
+	if serviceType == "meta" {
+		metaStore := surfstore.NewMetaStore(blockStoreAddrs)
+		surfstore.RegisterMetaStoreServer(grpcServer, metaStore)
+	} else if serviceType == "both" {
+		metaStore := surfstore.NewMetaStore(blockStoreAddrs)
+		surfstore.RegisterMetaStoreServer(grpcServer, metaStore)
+		blockStore := surfstore.NewBlockStore()
+		surfstore.RegisterBlockStoreServer(grpcServer, blockStore)
+	} else if serviceType == "block" {
+		blockStore := surfstore.NewBlockStore()
+		surfstore.RegisterBlockStoreServer(grpcServer, blockStore)
+	}
+	ln, err := net.Listen("tcp", hostAddr)
+	if err != nil {
+		log.Fatal("fail to listen on: ", hostAddr)
+		return err
+	}
+	err = grpcServer.Serve(ln)
+	if err != nil {
+		log.Fatal("fail to serve in grpc")
+		return err
+	}
+	return nil
 }

@@ -75,6 +75,8 @@ func main() {
 func PrintBlocksOnEachServer(client surfstore.RPCClient) {
 	allAddrs := []string{}
 	err := client.GetBlockStoreAddrs(&allAddrs)
+	//debug
+	//log.Println(len(allAddrs))
 	if err != nil {
 		log.Fatal("[Surfstore RPCClient]:", "Error During Fetching All BlockStore Addresses ", err)
 	}
